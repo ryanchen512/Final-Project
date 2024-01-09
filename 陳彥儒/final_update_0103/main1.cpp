@@ -8,6 +8,8 @@
 #include <string>
 #include <queue>
 
+using namespace std;
+
 void graph_input(Graph& G) {
 	int vertex_num, edge_num;
 	cin >> vertex_num >> edge_num;
@@ -84,7 +86,10 @@ int main(void) {
 			Set D;
 			insert_input(id, s, t, D, input_string);
 			P1.insert(id, s, D, t, G, T);
-
+			for(auto edge: T.E)
+			{
+				cout << edge.vertex[0] << edge.vertex[1] << endl;
+			}
 		}
 		else if (input_string[0] == 's') {
 			int id = stop_input(input_string);
