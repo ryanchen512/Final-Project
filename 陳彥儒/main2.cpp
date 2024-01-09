@@ -12,7 +12,7 @@ void graph_input(Graph& G) {
 	int vertex_num, edge_num;
 	cin >> vertex_num >> edge_num;
 
-	for (int i = 0; i < vertex_num; i++) {
+	for (int i = 1; i <= vertex_num; i++) {
 		G.V.push_back(i);
 	}
 
