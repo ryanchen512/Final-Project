@@ -70,12 +70,12 @@ int stop_input(string input_string) {
 	return stoi(tmp_s);
 }
 
-bool isdebug = true;
+bool isdebug = false;
 bool needToOutput = false;
 
 int main(void) {
 
-	freopen("sample_input.txt", "r", stdin);
+	freopen("Problem1_test_case.txt", "r", stdin);
 
 	Graph G;
 	Tree T;
@@ -85,6 +85,7 @@ int main(void) {
 	Problem1 P1(G);
 
 	string input_string;
+	int line = 0;
 	while (getline(cin, input_string)) {
 		if (input_string[0] == 'i') {
 			int id, s, t;

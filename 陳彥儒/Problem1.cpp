@@ -119,8 +119,9 @@ void Problem1::rearrange(Graph &G, Forest &MTidForest) {
 	for(auto tree: MTidForest.trees) 
 	tree = {{}, {}, tree.s, tree.id, 0};
 	for(int i=0; i<G.E.size(); i++) G.E[i].b = G.E[i].be;
-	for(int i=0; i<MTidForest.size; i++) 
-		insert(MTidForest.trees[i].id, MTidForest.trees[i].s, { }, requests[i].t, G, MTidForest.trees[i]);
+	for(int i=0; i<MTidForest.size; i++)
+		if(!requests[i].isstoped)
+			insert(MTidForest.trees[i].id, MTidForest.trees[i].s, { }, requests[i].t, G, MTidForest.trees[i]);
 	return;
 }
 
