@@ -7,8 +7,9 @@
 
 Problem1::Problem1(Graph G) {
 	/* Write your code here. */
-	numOfV = G.V.size(); for(int i=0; i<G.E.size(); i++) 
-	edgesMap[G.E[i].vertex[0]] = &G.E[i];
+	numOfV = G.V.size(); 
+	for(int i=0; i<G.E.size(); i++) 
+		edgesMap[G.E[i].vertex[0]][G.E[i].vertex[1]] = &G.E[i];
 }
 
 Problem1::~Problem1() {
@@ -20,7 +21,7 @@ void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	/* Store your output graph and multicast tree into G and MTid */
 	/* Write your code here. */
 	VertexDisjointSet vertex_dset(numOfV);
-	vector<graphEdge&> MTEdges_G;
+	vector<graphEdge*> MTEdges_G;
 	priority_queue<graphEdge*, vector<graphEdge*>, CompareEdge> edge_pq;
 	for(int i=0; i<G.E.size(); i++) if(G.E[i].b >= t) edge_pq.push(&G.E[i]);
 	// spanning tree
@@ -30,11 +31,11 @@ void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 		edge_pq.pop();
 		if(vertex_dset.find(newEdge->vertex[0]) != vertex_dset.find(newEdge->vertex[1]))
 		{
-			MTEdges_G.push_back(*newEdge);
+			MTEdges_G.push_back(newEdge);
 			vertex_dset.unionSets(newEdge->vertex[0], newEdge->vertex[1]);
 		}
 	}
-	// deal with connected edge and the effect of the edge
+	// deal with effect of traffic
 	int ct = 0, rootOfSourse = vertex_dset.find(s);
 	vector<treeEdge> MTEdges;
 	for(auto edge: MTEdges_G)
@@ -46,12 +47,10 @@ void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 			ct += edge->ce * t;
 		}
 	}
-	// find connected vertax
+	// output tree
 	vector<int> MTVertaces;
 	for(int vertex = 1; vertex<=numOfV; vertex++) 
-		if(vertex_dset.find(vertex) == rootOfSourse)
-			MTVertaces.push_back(vertex);
-	// output tree
+		if(vertex_dset.find(vertex) == rootOfSourse) MTVertaces.push_back(vertex);
 	MTid = { MTVertaces, MTEdges, s, id, ct};
 	return;
 }
@@ -60,11 +59,8 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 	/* Store your output graph and multicast tree forest into G and MTidForest
 	   Note: Please "only" include mutlicast trees that you added nodes in MTidForest. */
 	/* Write your code here. */
-	for(auto edge: MTidForest.trees[id].E)
-	{
-
-	}
-
+	for(auto t_edge: MTidForest.trees[id].E)
+		edgesMap[t_edge.vertex[0]][t_edge.vertex[0]] += requests[id].t;
 	return;
 }
 

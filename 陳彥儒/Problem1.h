@@ -19,9 +19,8 @@ public:
 	void rearrange(Graph &G, Forest &MTidForest);
 private:
     int numOfV;
-    vector<request> requestsMap;
-    map<int, graphEdge*> edgesMap;
-    void spanningTree(Graph &G, Tree &tree, VertexDisjointSet &vertex_dset, vector<treeEdge> &MTedges, request r);
+    vector<request> requests;
+    map<int, map<int, graphEdge*>> edgesMap;
 };
 
 class CompareEdge
