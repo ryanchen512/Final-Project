@@ -55,7 +55,8 @@ void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	for(int vertex = 1; vertex<=numOfV; vertex++) 
 		if(vertex_dset.find(vertex) == rootOfSourse) MTVertaces.push_back(vertex);
 	MTid = { MTVertaces, MTEdges, s, id, ct};
-	requests.push_back({id, s, t, (MTVertaces.size() == numOfV), false});
+	if(id > requests.size())
+		requests.push_back({id, s, t, (MTVertaces.size() == numOfV), false});
 	return;
 }
 
@@ -68,6 +69,7 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 	for(auto t_edge: MTidForest.trees[idx].E)
 		edgesMap[t_edge.vertex[0]][t_edge.vertex[1]]->b += requests[idx].t;
 	MTidForest.trees[idx] = { { }, { }, requests[idx].s, id, 0};
+	requests[idx].isstoped = true;
 	// connect other partial tree
 	for(idx = 0; idx < MTidForest.size; idx++)
 	{
@@ -114,7 +116,11 @@ void Problem1::rearrange(Graph &G, Forest &MTidForest) {
 	   Note: Please include "all" active mutlicast trees in MTidForest. */
 
 	/* Write your code here. */
-	
+	for(auto tree: MTidForest.trees) 
+	tree = {{}, {}, tree.s, tree.id, 0};
+	for(int i=0; i<G.E.size(); i++) G.E[i].b = G.E[i].be;
+	for(int i=0; i<MTidForest.size; i++) 
+		insert(MTidForest.trees[i].id, MTidForest.trees[i].s, { }, requests[i].t, G, MTidForest.trees[i]);
 	return;
 }
 
