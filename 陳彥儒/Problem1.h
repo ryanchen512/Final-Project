@@ -32,11 +32,12 @@ public:
 struct request
 {
     int id, s, t;
+    bool isFull, isstoped;
 };
 
 class VertexDisjointSet {
 public:
-    VertexDisjointSet(int numOfV);
+    VertexDisjointSet(int numberOfV, vector<int> connectedVerteces = { });
 	~VertexDisjointSet();
     int find(int x);
     void unionSets(int x, int y);
