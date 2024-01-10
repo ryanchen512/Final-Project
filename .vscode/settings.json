@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "vector": "cpp",
-        "fstream": "cpp",
-        "queue": "cpp",
-        "__locale": "cpp"
-    }
-}

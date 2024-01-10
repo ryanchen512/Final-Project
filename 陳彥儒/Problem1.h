@@ -7,6 +7,29 @@
 
 using namespace std;
 
+struct request;
+class VertexDisjointSet;
+
+class Problem1 {
+public:
+	Problem1(Graph G);     //constructor
+	~Problem1();        //destructor
+	void insert(int id, int s, Set D, int t, Graph &G, Tree &MTid);
+	void stop(int id, Graph &G, Forest &MTidForest);
+	void rearrange(Graph &G, Forest &MTidForest);
+private:
+    int numOfV;
+    vector<request> requestsMap;
+    map<int, graphEdge*> edgesMap;
+    void spanningTree(Graph &G, Tree &tree, VertexDisjointSet &vertex_dset, vector<treeEdge> &MTedges, request r);
+};
+
+class CompareEdge
+{
+public:
+    bool operator()(graphEdge *lhs, graphEdge *rhs) { return (lhs->ce > rhs->ce); }
+};
+
 struct request
 {
     int id, s, t;
@@ -23,26 +46,5 @@ private:
     pair<int, int>* d_set;
 	int numRoots;
 };
-
-class Problem1 {
-public:
-	Problem1(Graph G);     //constructor
-	~Problem1();        //destructor
-	void insert(int id, int s, Set D, int t, Graph &G, Tree &MTid);
-	void stop(int id, Graph &G, Forest &MTidForest);
-	void rearrange(Graph &G, Forest &MTidForest);
-private:
-    int numOfV;
-    map<int, request> requestsMap;
-    map<int, graphEdge*> edgesMap;
-    void spanningTree(Graph &G, Tree &tree, VertexDisjointSet &vertex_dset, vector<treeEdge> &MTedges, request r);
-};
-
-class CompareEdge
-{
-public:
-    bool operator()(graphEdge *lhs, graphEdge *rhs) { return (lhs->ce > rhs->ce); }
-};
-
 
 #endif
