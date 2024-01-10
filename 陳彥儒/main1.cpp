@@ -70,7 +70,12 @@ int stop_input(string input_string) {
 	return stoi(tmp_s);
 }
 
+bool isdebug = false;
+bool needToOutput = false;
+
 int main(void) {
+
+	freopen("Problem1_test_case.txt", "r", stdin);
 
 	Graph G;
 	Tree T;
@@ -80,25 +85,41 @@ int main(void) {
 	Problem1 P1(G);
 
 	string input_string;
+	int line = 0;
 	while (getline(cin, input_string)) {
 		if (input_string[0] == 'i') {
 			int id, s, t;
 			Set D;
 			insert_input(id, s, t, D, input_string);
 			P1.insert(id, s, D, t, G, T);
-			for(auto edge: T.E)
-			{
-				cout << edge.vertex[0] << edge.vertex[1] << endl;
-			}
+			F.trees.push_back(T);
+			F.size ++;
+			needToOutput = true;
 		}
 		else if (input_string[0] == 's') {
 			int id = stop_input(input_string);
 			P1.stop(id, G, F);
-
+			needToOutput = true;
 		}
 		else if (input_string[0] == 'r') {
 			P1.rearrange(G, F);
-
+			needToOutput = true;
+		}
+		if(isdebug && needToOutput)
+		{
+			static int command = 0;
+			command++;
+			cout << "\033[1;33mCommand " << command << "\033[0m" << endl;
+			for(auto tree: F.trees)
+			{
+				cout << "request id: " << tree.id << endl;
+				for(auto edge: tree.E)
+				{
+					cout << "{" << edge.vertex[0] << ", " << edge.vertex[1] << "}, ";
+				}
+				cout << "total cost is " << tree.ct << endl;
+			}
+			needToOutput = false;
 		}
 	}
 	return 0;
