@@ -84,16 +84,27 @@ int main(void) {
 			Set D;
 			insert_input(id, s, t, D, input_string);
 			P1.insert(id, s, D, t, G, T);
-
+			F.trees.push_back(T);
+			F.size++;
 		}
 		else if (input_string[0] == 's') {
 			int id = stop_input(input_string);
 			P1.stop(id, G, F);
-
 		}
 		else if (input_string[0] == 'r') {
 			P1.rearrange(G, F);
-
+		}
+		for(auto it=G.E.begin();it!=G.E.cend();it++){
+			cout<<"{"<<(it->vertex[0])<<", "<<(it->vertex[1])<<"}"<<"bandwidth = "<<(it->b)<<", cost = "<<(it->ce)<<endl;
+		}
+		if(F.size){
+			for(auto it=--F.trees.cend();it!=F.trees.cend();it++){
+				cout<<"tree id = " << it->id<<" root = " << it->s << " bandwidth cost = " << it->ct<<endl;
+				for(auto itn=it->E.begin(); itn!=it->E.cend();itn++){
+					cout<<"{ "<<itn->vertex[0]<<" "<<itn->vertex[1]<<" }";
+				}
+				cout<<endl;
+			}
 		}
 	}
 	return 0;
