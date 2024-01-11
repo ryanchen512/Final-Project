@@ -4,10 +4,13 @@
 #include <iostream>
 #include "basicDS.h"
 #include "Problem1.cpp"
+#include <chrono>
 #include <fstream>
 #include <string>
 #include <queue>
-#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
 
 void graph_input(Graph& G) {
 	int vertex_num, edge_num;
@@ -69,8 +72,10 @@ int stop_input(string input_string) {
 	return stoi(tmp_s);
 }
 
+bool isdebug = true;
+
 int main(void) {
-	auto start = std::chrono::high_resolution_clock::now();
+	auto start = high_resolution_clock::now();
 	freopen("Problem1_test_case.txt", "r", stdin);
 	freopen("sample_output.txt", "w", stdout);
 
@@ -82,50 +87,71 @@ int main(void) {
 	Problem1 P1(G);
 
 	string input_string;
+	int command = 0;
 	while (getline(cin, input_string)) {
 		if (input_string[0] == 'i') {
 			int id, s, t;
 			Set D;
 			insert_input(id, s, t, D, input_string);
 			P1.insert(id, s, D, t, G, T);
-			cout<<"tree id = " << T.id<<" root = " << T.s << " bandwidth cost = " << T.ct<<endl;
-			for(auto it=T.E.begin(); it!=T.E.cend();it++){
-				cout<<"{ "<<it->vertex[0]<<" "<<it->vertex[1]<<" }";
+			/*
+			if(isdebug)
+			{
+				command++;
+				cout << "\033[1;33mCommand " << command << "  insert" << "\033[0m" << endl;
+				cout << "request id: " << T.id << endl;
+				for(auto edge: T.E)
+				{
+					cout << "{" << edge.vertex[0] << ", " << edge.vertex[1] << "}, ";
+				}
+				cout << "total cost is " << T.ct << endl;
 			}
-			cout<<endl;
+			*/
 		}
 		else if (input_string[0] == 's') {
 			int id = stop_input(input_string);
 			P1.stop(id, G, F);
-			if(F.size){
-				for(auto it=F.trees.begin();it!=F.trees.cend();it++){
-					cout<<"tree id = " << it->id<<" root = " << it->s << " bandwidth cost = " << it->ct<<endl;
-					for(auto itn=it->E.begin(); itn!=it->E.cend();itn++){
-						cout<<"{ "<<itn->vertex[0]<<" "<<itn->vertex[1]<<" }";
+			/*
+			if(isdebug)
+			{
+				command++;
+				cout << "\033[1;33mCommand " << command << "  stop" << "\033[0m" << endl;
+				for(auto tree: F.trees)
+				{
+					cout << "request id: " << tree.id << endl;
+					for(auto edge: tree.E)
+					{
+						cout << "{" << edge.vertex[0] << ", " << edge.vertex[1] << "}, ";
 					}
-					cout<<endl;
+					cout << "total cost is " << tree.ct << endl;
 				}
+				if(F.trees.size() == 0) cout << "No tree be modified" << endl;
 			}
+			*/
 		}
 		else if (input_string[0] == 'r') {
 			P1.rearrange(G, F);
-			if(F.size){
-				for(auto it=F.trees.begin();it!=F.trees.cend();it++){
-				cout<<"tree id = " << it->id<<" root = " << it->s << " bandwidth cost = " << it->ct<<endl;
-				for(auto itn=it->E.begin(); itn!=it->E.cend();itn++){
-					cout<<"{ "<<itn->vertex[0]<<" "<<itn->vertex[1]<<" }";
+			/*
+			if(isdebug)
+			{
+				command++;
+				cout << "\033[1;33mCommand " << command << "  rearrange" << "\033[0m" << endl;
+				for(auto tree: F.trees)
+				{
+					cout << "request id: " << tree.id << endl;
+					for(auto edge: tree.E)
+					{
+						cout << "{" << edge.vertex[0] << ", " << edge.vertex[1] << "}, ";
+					}
+					cout << "total cost is " << tree.ct << endl;
 				}
-				cout<<endl;
 			}
+			*/
 		}
-		}
-		//for(auto it=G.E.begin();it!=G.E.cend();it++){
-			//cout<<"{"<<(it->vertex[0])<<", "<<(it->vertex[1])<<"}"<<"bandwidth = "<<(it->b)<<", cost = "<<(it->ce)<<endl;
-		//}
-	auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+	}
+	auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
 
     cout << "Time taken by function: " << duration.count() << " microseconds" << std::endl;
-	}
 	return 0;
 }
