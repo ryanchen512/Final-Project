@@ -57,6 +57,8 @@ void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	MTid = { MTVertaces, MTEdges, s, id, ct};
 	if(id > requests.size())
 		requests.push_back({id, s, t, (MTVertaces.size() == numOfV), false});
+	else
+		requests[id - 1].isFull = (MTVertaces.size() == numOfV);
 	return;
 }
 
