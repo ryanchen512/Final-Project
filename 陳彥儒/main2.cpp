@@ -47,7 +47,6 @@ void insert_input(int& id, int& s, int& t, Set& D, string input_string) {
 			break;
 		}
 	}
-
 	q.pop();
 	id = stoi(q.front());
 	q.pop();
@@ -63,7 +62,6 @@ void insert_input(int& id, int& s, int& t, Set& D, string input_string) {
 		D.destinationVertices.push_back(tmp_i);
 		D.size++;
 	}
-
 	t = stoi(q.front());
 	q.pop();
 }
@@ -80,7 +78,8 @@ int command = 0;
 int main(void) {
 	
 	auto start = high_resolution_clock::now();
-	freopen("sample_input.txt", "r", stdin);
+	freopen("Problem1_test_case.txt", "r", stdin);
+	//freopen("sample_input.txt", "r", stdin);
 	//freopen("sample_output.txt", "w", stdout);
 	Graph G;
 	Tree T;

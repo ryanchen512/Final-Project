@@ -213,7 +213,7 @@ void Problem2::updateVertiexDegreeMap()
 int CompareEdge::computePoint(graphEdge *edge)
 { 
 	auto degreeMap = Problem2::vertexDegreeMap;
-	return degreeMap[edge->vertex[0]] + degreeMap[edge->vertex[0]] - square(edge->ce);
+	return degreeMap[edge->vertex[0]] + degreeMap[edge->vertex[0]] - square(edge->ce) * 10;
 }
 
 
