@@ -82,7 +82,7 @@ void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	int now=s;
 	MTid.V.push_back(now);
 	arr[s]=true;
-	for(int i=1;i<G.V.size();i++){
+	for(int i=1;i<graph.V.size();i++){
 		for(auto &g:edgesMap[now]){
 			if(!arr[g.first] && g.second->b >= t){
 				pq.push(g.second);
@@ -191,7 +191,7 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 					}
 				}
 				
-				for(int i=MTid->V.size()-1;i<G.V.size();i++){
+				for(int i=MTid->V.size()-1;i<graph.V.size();i++){
 					for(auto &g:edgesMap[now]){
 						if(!arr[g.first] && g.second->b >= t){
 							pq.push(g.second);
@@ -254,6 +254,7 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 			break;
 		}
 	}
+	G=graph;
 
 	return;
 }
@@ -270,7 +271,7 @@ void Problem1::rearrange(Graph &G, Forest &MTidForest) {
 
 	int numtree=F.trees.size();
 
-	for(auto &gE:G.E){
+	for(auto &gE:graph.E){
 		gE.b=gE.be;
 	}
 
@@ -288,6 +289,7 @@ void Problem1::rearrange(Graph &G, Forest &MTidForest) {
 		int s=MTid->s;
 		int t=MTid->t;
 		auto dis=MTid->all;
+		MTid->ct=0;
 		bool* arr=new bool[100001]();
 
 		priority_queue<graphEdge*, vector<graphEdge*>, cmp> pq;
@@ -295,7 +297,7 @@ void Problem1::rearrange(Graph &G, Forest &MTidForest) {
 		MTid->V.push_back(now);
 		arr[s]=true;
 
-		for(int i=1;i<G.V.size();i++){
+		for(int i=1;i<graph.V.size();i++){
 			for(auto &g:edgesMap[now]){
 				if(!arr[g.first] && g.second->b >= t){
 					pq.push(g.second);
@@ -350,7 +352,7 @@ void Problem1::rearrange(Graph &G, Forest &MTidForest) {
 
 		delete [] arr;
 	}
-	
+	G = graph;
 	return;
 }
 
