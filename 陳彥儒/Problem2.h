@@ -7,7 +7,6 @@
 #include <algorithm>
 
 using namespace std;
-#define SQUARE(x) ((x) * (x))
 
 struct request;
 class VertexDisjointSet;
@@ -18,22 +17,23 @@ public:
 	bool insert(int id, int s, Set D, int t, Graph &G, Tree &MTid);
 	void stop(int id, Graph &G, Forest &MTidForest);
 	void rearrange(Graph &G, Forest &MTidForest);
-    static map<int, int> vertiexDegreeMap;
+    static map<int, int> vertexDegreeMap;
 private:
     void updateVertiexDegreeMap();
     Graph graph;
+    int numOfV;
+    map<int, map<int, graphEdge*>> edgesMap;
+    map<int, request> requests;
+    inline int square(int x) { return x * x; }
 };
+map<int, int> Problem2::vertexDegreeMap;
 
 class CompareEdge
 {
 public:
     bool operator()(graphEdge *lhs, graphEdge *rhs) 
     { return computePoint(lhs) > computePoint(rhs); }
-    int computePoint(graphEdge *edge)
-    { 
-        auto degreeMap = Problem2::vertiexDegreeMap;
-        return square(degreeMap[edge->vertex[0]]) + square(degreeMap[edge->vertex[0]]) - edge->ce;
-    }
+    int computePoint(graphEdge *edge);
     inline int square(int x) { return x * x; }
 };
 
