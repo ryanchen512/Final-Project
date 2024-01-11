@@ -72,13 +72,15 @@ bool Problem2::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	vector<int> usefulVertex;
 	for(int v: usefulVertexSet) usefulVertex.push_back(v);
 	// output tree
+	vector<treeEdge> usefulMTEdge_T;
+	for(auto edge: usefulMTEdge) usefulMTEdge_T.push_back({edge->vertex[0], edge->vertex[1]})
 	if(requests.find(id) == requests.end())
 	{
-		requests[id] = {id, s, t, true, {usefulVertex, usefulMTEdge, s, id, ct} };
+		requests[id] = {id, s, t, true, {usefulVertex, usefulMTEdge_T, s, id, ct} };
 		MTid = requests[id].MT;
 	}
 	else
-		requests[id].MT = {usefulVertex, usefulMTEdge, s, id, ct};
+		requests[id].MT = {usefulVertex, usefulMTEdge_T, s, id, ct};
 	G = graph;
 	return true;
 }
