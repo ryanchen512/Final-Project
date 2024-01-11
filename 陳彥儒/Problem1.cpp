@@ -105,6 +105,9 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 			}
 		}
 		// output tree
+		for(int vertex = 1; vertex<=numOfV; vertex++) 
+			if(vertex_dset.find(vertex) == rootOfSourse) request.MT.V.push_back(vertex);
+		sort(request.MT.V.begin(), request.MT.V.end());
 		if(new_MTEdges_G.size() != 0) MTidForest.trees.push_back(request.MT);
 	}
 	MTidForest.size = MTidForest.trees.size();

@@ -44,3 +44,9 @@ void Problem2::rearrange(Graph &G, Forest &MTidForest) {
 	
 	return;
 }
+
+int CompareEdge::computePoint(graphEdge *edge)
+{ 
+	auto degreeMap = Problem2::vertiexDegreeMap;
+	return square(degreeMap[edge->vertex[0]]) + square(degreeMap[edge->vertex[0]]) - edge->ce;
+}
