@@ -121,6 +121,7 @@ void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 		}
 	}
 	
+	MTid.ct*=t;
 	MTidI.V=MTid.V;
 	MTidI.E=MTid.E;
 	MTidI.s=s;
@@ -248,8 +249,8 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 						pq.pop();
 					}
 				}
+				MTid->ct*=t;
 				
-				delete [] arr;
 				if(change){
 					Tree T;
 					T.V=MTid->V;
@@ -259,6 +260,8 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 					T.ct=MTid->ct;	
 					MTidForest.size++;
 					MTidForest.trees.push_back(T);
+
+					delete [] arr;
 				}
 			}
 			break;
@@ -351,7 +354,7 @@ void Problem1::rearrange(Graph &G, Forest &MTidForest) {
 				pq.pop();
 			}
 		}
-
+		MTid->ct*=t;
 		Tree T;
 		T.V=MTid->V;
 		T.E=MTid->E;

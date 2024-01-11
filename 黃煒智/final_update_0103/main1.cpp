@@ -7,6 +7,7 @@
 #include <fstream>
 #include <string>
 #include <queue>
+#include <chrono>
 
 void graph_input(Graph& G) {
 	int vertex_num, edge_num;
@@ -69,6 +70,9 @@ int stop_input(string input_string) {
 }
 
 int main(void) {
+	auto start = std::chrono::high_resolution_clock::now();
+	freopen("Problem1_test_case.txt", "r", stdin);
+	freopen("sample_output.txt", "w", stdout);
 
 	Graph G;
 	Tree T;
@@ -115,9 +119,13 @@ int main(void) {
 			}
 		}
 		}
-		//or(auto it=G.E.begin();it!=G.E.cend();it++){
+		//for(auto it=G.E.begin();it!=G.E.cend();it++){
 			//cout<<"{"<<(it->vertex[0])<<", "<<(it->vertex[1])<<"}"<<"bandwidth = "<<(it->b)<<", cost = "<<(it->ce)<<endl;
 		//}
+	auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+
+    cout << "Time taken by function: " << duration.count() << " microseconds" << std::endl;
 	}
 	return 0;
 }
