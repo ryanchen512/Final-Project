@@ -16,7 +16,6 @@ Problem1::Problem1(Graph G) {
 
 Problem1::~Problem1() {
 	/* Write your code here. */
-
 }
 
 void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
@@ -55,10 +54,12 @@ void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	for(int vertex = 1; vertex<=numOfV; vertex++) 
 		if(vertex_dset.find(vertex) == rootOfSourse) MTVertaces.push_back(vertex);
 	if(id > requests.size())
-		forest.trees.push_back({ MTVertaces, MTEdges, s, id, ct}),
-		requests[id] = {id, s, t, (MTVertaces.size() == numOfV), false};
+	{
+		requests[id] = {id, s, t, (MTVertaces.size() == numOfV), false, {MTVertaces, MTEdges, s, id, ct} };
+		MTid = requests[id].MT;
+	}
 	else
-		*(requests[id].MT) = { MTVertaces, MTEdges, s, id, ct};
+		requests[id].MT = {MTVertaces, MTEdges, s, id, ct};
 	return;
 }
 
@@ -67,20 +68,19 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 	   Note: Please "only" include mutlicast trees that you added nodes in MTidForest. */
 	/* Write your code here. */
 	// stop tree
-	int idx = id - 1;
-	for(auto t_edge: MTidForest.trees[idx].E)
-		edgesMap[t_edge.vertex[0]][t_edge.vertex[1]]->b += requests[idx].t;
-	MTidForest.trees[idx] = { { }, { }, requests[idx].s, id, 0};
-	requests[idx].isstoped = true;
+	for(auto t_edge: MTidForest.trees[id].E)
+		edgesMap[t_edge.vertex[0]][t_edge.vertex[1]]->b += requests[id].t;
+	MTidForest.trees[id] = { { }, { }, requests[id].s, id, 0};
+	requests[id].isstoped = true;
 	// connect other partial tree
-	for(idx = 0; idx < MTidForest.size; idx++)
+	for(id = 0; id < MTidForest.size; id++)
 	{
-		if(requests[idx].isFull || requests[idx].isstoped) continue;
+		if(requests[id].isFull || requests[id].isstoped) continue;
 		// init
-		VertexDisjointSet vertex_dset(numOfV, MTidForest.trees[idx].V);
+		VertexDisjointSet vertex_dset(numOfV, MTidForest.trees[id].V);
 		vector<graphEdge*> new_MTEdges_G;
 		EdgePQ edge_pq;
-		for(int i=0; i<G.E.size(); i++) if(G.E[i].b >= requests[idx].t) edge_pq.push(&G.E[i]);
+		for(int i=0; i<G.E.size(); i++) if(G.E[i].b >= requests[id].t) edge_pq.push(&G.E[i]);
 		// spanning tree
 		while (!edge_pq.empty() && vertex_dset.numOfRoot() > 1)
 		{
@@ -93,22 +93,22 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 			}
 		}
 		// deal with effect of traffic
-		int addintional_ct = 0, rootOfSourse = vertex_dset.find(requests[idx].s);
+		int addintional_ct = 0, rootOfSourse = vertex_dset.find(requests[id].s);
 		vector<treeEdge> MTEdges;
 		for(auto edge: new_MTEdges_G)
 		{
 			if(vertex_dset.find(edge->vertex[0]) == rootOfSourse) // exclude unconnected edges
 			{
 				MTEdges.push_back( { edge->vertex[0], edge->vertex[1]} );
-				edge->b -= requests[idx].t;
-				addintional_ct += edge->ce * requests[idx].t;
+				edge->b -= requests[id].t;
+				addintional_ct += edge->ce * requests[id].t;
 			}
 		}
 		// output tree
-		Tree &MTid = MTidForest.trees[idx];
-		MTidForest.trees[idx].V.clear();
+		Tree &MTid = MTidForest.trees[id];
+		MTidForest.trees[id].V.clear();
 		for(int vertex = 1; vertex<=numOfV; vertex++)
-			if(vertex_dset.find(vertex) == rootOfSourse) MTidForest.trees[idx].V.push_back(vertex);
+			if(vertex_dset.find(vertex) == rootOfSourse) MTidForest.trees[id].V.push_back(vertex);
 	}
 	return;
 }

@@ -4,6 +4,7 @@
 #include "basicDS.h"
 #include <map>
 #include <queue>
+#include <algorithm>
 
 using namespace std;
 
@@ -22,20 +23,26 @@ private:
     int numOfV;
     map<int, map<int, graphEdge*>> edgesMap;
     map<int, request> requests;
-    Forest forest;
 };
 
 class CompareEdge
 {
 public:
-    bool operator()(graphEdge *lhs, graphEdge *rhs) { return (lhs->ce > rhs->ce); }
+    bool operator()(graphEdge *lhs, graphEdge *rhs) { return lhs->ce > rhs->ce; }
+};
+
+class CompareTree
+{
+public:
+    bool operator()(const Tree* lhs, const Tree* rhs) const { return lhs->id < rhs->id; }
+    //bool operator()(Tree *lhs, Tree *rhs) { return (lhs->id < rhs->id); }
 };
 
 struct request
 {
     int id, s, t;
     bool isFull, isstoped;
-    Tree* MT;
+    Tree MT;
 };
 
 class VertexDisjointSet {
