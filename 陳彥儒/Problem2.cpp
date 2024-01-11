@@ -49,30 +49,13 @@ bool Problem2::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 			vertex_dset.unionSets(newEdge->vertex[0], newEdge->vertex[1]);
 		}
 	}
+	// check tree is full
+	for(auto vertex: D.destinationVertices) 
+		if(vertex_dset.find(vertex) != vertex_dset.find(s)) return false;
 	// deal with effect of traffic
-	int ct = 0, rootOfSourse = vertex_dset.find(s);
-	vector<treeEdge> MTEdges;
-	for(auto edge: MTEdges_G)
-	{
-		if(vertex_dset.find(edge->vertex[0]) == rootOfSourse) // exclude unconnected edges
-		{
-			MTEdges.push_back( { edge->vertex[0], edge->vertex[1]} );
-			edge->b -= t;
-			ct += edge->ce * t;
-		}
-	}
+	
 	// output tree
-	vector<int> MTVertaces;
-	for(int vertex = 1; vertex<=numOfV; vertex++) 
-		if(vertex_dset.find(vertex) == rootOfSourse) MTVertaces.push_back(vertex);
-	if(requests.find(id) == requests.end())
-	{
-		requests[id] = {id, s, t, (MTVertaces.size() == numOfV), {MTVertaces, MTEdges, s, id, ct} };
-		MTid = requests[id].MT;
-	}
-	else
-		requests[id].MT = {MTVertaces, MTEdges, s, id, ct};
-	G = graph;
+
 	return true;
 }
 
