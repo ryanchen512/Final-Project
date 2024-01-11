@@ -109,9 +109,38 @@ int main(void) {
 		else if (input_string[0] == 's') {
 			int id = stop_input(input_string);
 			P1.stop(id, G, F);
+			if(isdebug)
+			{
+				command++;
+				cout << "\033[1;33mCommand " << command << "  stop" << "\033[0m" << endl;
+				for(auto tree: F.trees)
+				{
+					cout << "request id: " << tree.id << endl;
+					for(auto edge: tree.E)
+					{
+						cout << "{" << edge.vertex[0] << ", " << edge.vertex[1] << "}, ";
+					}
+					cout << "total cost is " << tree.ct << endl;
+				}
+				if(F.trees.size() == 0) cout << "No tree be modified" << endl;
+			}
 		}
 		else if (input_string[0] == 'r') {
 			P1.rearrange(G, F);
+			if(isdebug)
+			{
+				command++;
+				cout << "\033[1;33mCommand " << command << "  rearrange" << "\033[0m" << endl;
+				for(auto tree: F.trees)
+				{
+					cout << "request id: " << tree.id << endl;
+					for(auto edge: tree.E)
+					{
+						cout << "{" << edge.vertex[0] << ", " << edge.vertex[1] << "}, ";
+					}
+					cout << "total cost is " << tree.ct << endl;
+				}
+			}
 		}
 	}
 	auto stop = high_resolution_clock::now();

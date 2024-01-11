@@ -41,7 +41,7 @@ public:
 struct request
 {
     int id, s, t;
-    bool isFull, isstoped;
+    bool isFull;
     Tree MT;
 };
 
