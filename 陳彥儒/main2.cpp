@@ -4,9 +4,14 @@
 #include <iostream>
 #include "basicDS.h"
 #include "Problem2.cpp"
+#include <chrono>
 #include <fstream>
 #include <string>
 #include <queue>
+
+using namespace std;
+using namespace std::chrono;
+
 
 void graph_input(Graph& G) {
 	int vertex_num, edge_num;
@@ -68,8 +73,15 @@ int stop_input(string input_string) {
 	return stoi(tmp_s);
 }
 
-int main(void) {
+bool isdebug = true;
+int command = 0;
 
+
+int main(void) {
+	
+	auto start = high_resolution_clock::now();
+	freopen("Problem1_test_case.txt", "r", stdin);
+	//freopen("sample_output.txt", "w", stdout);
 	Graph G;
 	Tree T;
 	Forest F;
@@ -85,17 +97,58 @@ int main(void) {
             bool take;
 			insert_input(id, s, t, D, input_string);
 			take = P2.insert(id, s, D, t, G, T);
-
+			if(isdebug)
+			{
+				command++;
+				cout << "\033[1;33mCommand " << command << "  insert" << "\033[0m" << endl;
+				cout << "request id: " << T.id << endl;
+				for(auto edge: T.E)
+				{
+					cout << "{" << edge.vertex[0] << ", " << edge.vertex[1] << "}, ";
+				}
+				cout << "total cost is " << T.ct << endl;
+			}
 		}
 		else if (input_string[0] == 's') {
 			int id = stop_input(input_string);
 			P2.stop(id, G, F);
-
+			if(isdebug)
+			{
+				command++;
+				cout << "\033[1;33mCommand " << command << "  stop" << "\033[0m" << endl;
+				for(auto tree: F.trees)
+				{
+					cout << "request id: " << tree.id << endl;
+					for(auto edge: tree.E)
+					{
+						cout << "{" << edge.vertex[0] << ", " << edge.vertex[1] << "}, ";
+					}
+					cout << "total cost is " << tree.ct << endl;
+				}
+				if(F.trees.size() == 0) cout << "No tree be modified" << endl;
+			}
 		}
 		else if (input_string[0] == 'r') {
 			P2.rearrange(G, F);
-
+			if(isdebug)
+			{
+				command++;
+				cout << "\033[1;33mCommand " << command << "  rearrange" << "\033[0m" << endl;
+				for(auto tree: F.trees)
+				{
+					cout << "request id: " << tree.id << endl;
+					for(auto edge: tree.E)
+					{
+						cout << "{" << edge.vertex[0] << ", " << edge.vertex[1] << "}, ";
+					}
+					cout << "total cost is " << tree.ct << endl;
+				}
+			}
 		}
 	}
+	auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+
+    cout << "Time taken by function: " << duration.count() << " microseconds" << std::endl;
 	return 0;
 }

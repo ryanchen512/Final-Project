@@ -1,17 +1,12 @@
 #include "basicDS.h"
+#include "Problem2.h"
+
+using namespace std;
+using EdgePQ = priority_queue<graphEdge*, vector<graphEdge*>, CompareEdge>;
 
 /* You can add more functions or variables in each class. 
    But you "Shall Not" delete any functions or variables that TAs defined. */
 
-class Problem2 {
-public:
-
-	Problem2(Graph G);  //constructor
-	~Problem2();        //destructor
-	bool insert(int id, int s, Set D, int t, Graph &G, Tree &MTid);
-	void stop(int id, Graph &G, Forest &MTidForest);
-	void rearrange(Graph &G, Forest &MTidForest);
-};
 
 Problem2::Problem2(Graph G) {
 	/* Write your code here. */
@@ -27,7 +22,6 @@ bool Problem2::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	/* Store your output graph and multicast tree into G and MTid */
 	
 	/* Write your code here. */
-
 
 	/* You should return true or false according the insertion result */
 	return true;

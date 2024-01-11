@@ -73,6 +73,7 @@ int stop_input(string input_string) {
 }
 
 bool isdebug = false;
+int command = 0;
 
 int main(void) {
 	auto start = high_resolution_clock::now();
@@ -87,7 +88,6 @@ int main(void) {
 	Problem1 P1(G);
 
 	string input_string;
-	int command = 0;
 	while (getline(cin, input_string)) {
 		if (input_string[0] == 'i') {
 			int id, s, t;
