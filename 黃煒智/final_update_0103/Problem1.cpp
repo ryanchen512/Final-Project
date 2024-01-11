@@ -1,13 +1,12 @@
 #include<iostream>
 #include "basicDS.h"
 #include <queue>
+#include <algorithm>
 using namespace std;
 
 /* You can add more functions or variables in each class. 
    But you "Shall Not" delete any functions or variables that TAs defined. */
 
-int losesize=0;
-int loseid[100001];
 
 struct cmp{
 	bool operator()(const graphEdge* l, const graphEdge* r){
@@ -17,12 +16,24 @@ struct cmp{
 
 class Information{
 	public:
+		vector<int> V;
+		vector<treeEdge> E;
+		int s;          // source node
+		int id;         // corresponding multicast request id
+		int ct;         // transmission cost of multicast tree
 		bool stop=false;
-		int s, t;
+		int t;
 		vector<int> all;
 };
 
-Information inf[100005];
+struct FInformation{
+	int size = 0;
+	vector<Information> trees;
+};
+
+bool cmp1(const Information l, const Information r) {
+	return l.id < r.id;
+}
 
 class Problem1 {
 public:
@@ -32,6 +43,9 @@ public:
 	void insert(int id, int s, Set D, int t, Graph &G, Tree &MTid);
 	void stop(int id, Graph &G, Forest &MTidForest);
 	void rearrange(Graph &G, Forest &MTidForest);
+
+private:
+	FInformation F;
 };
 
 Problem1::Problem1(Graph G) {
@@ -46,9 +60,7 @@ Problem1::~Problem1() {
 
 void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	/* Store your output graph and multicast tree into G and MTid */
-	inf[id].s=s;
-	inf[id].t=t;
-	inf[id].all=D.destinationVertices;
+	Information MTidI;
 
 	MTid.id=id;
 	MTid.s=s;
@@ -108,9 +120,19 @@ void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 			pq.pop();
 		}
 	}
-	if(MTid.V.size()<D.destinationVertices.size()){
-		loseid[losesize++]=MTid.id;
-	}
+	
+	MTid.ct*=t;
+	MTidI.V=MTid.V;
+	MTidI.E=MTid.E;
+	MTidI.s=s;
+	MTidI.id=id;
+	MTidI.ct=MTid.ct;
+	MTidI.t=t;
+	MTidI.all=D.destinationVertices;
+	
+	F.trees.push_back(MTidI);
+	F.size++;
+
 	delete [] arr;
 
 	return;
@@ -121,33 +143,44 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 	   Note: Please "only" include mutlicast trees that you added nodes in MTidForest. */
 	
 	/* Write your code here. */
-	int newlose=0;
+	MTidForest.size=0;
+	MTidForest.trees.clear();
+	sort(F.trees.begin(), F.trees.end(), cmp1);
 
-	for(auto it=MTidForest.trees.begin();it!=MTidForest.trees.cend();it++){
+	for(auto it=F.trees.begin();it!=F.trees.cend();it++){
 		if(it->id==id){
-			inf[id].stop=true;
-			auto nowtree=&MTidForest.trees[id-1];
+			it->stop=true;
+			Information* nowtree;
+			for(auto &ittre:F.trees){
+				if(ittre.id==id){
+					nowtree=&ittre;
+					break;
+				}
+			}
 			for(auto ittre=nowtree->E.begin();ittre!=nowtree->E.cend();ittre++){
 				for(auto itgre=G.E.begin();itgre!=G.E.cend();itgre++){
 					if(ittre->vertex[0]==itgre->vertex[0]&&ittre->vertex[1]==itgre->vertex[1]){
-						itgre->b+=inf[id].t;
+						itgre->b+=(nowtree->t);
 						//cout<<ittre->vertex[0]<<" "<<ittre->vertex[1]<<" "<<itgre->b;
 						break;
 					}
 				}
 				//cout<<endl;
 			}
-			nowtree->ct=0;
+			nowtree->V.clear();
 			nowtree->E.clear();
+			nowtree->ct=0;
 			
-			for(auto nowtreeid=0;nowtreeid<losesize;nowtreeid++){
+			for(auto nowtree=F.trees.begin();nowtree!=F.trees.cend();nowtree++){
 				//cout<<inf[nowtreeid].stop<<MTidForest.trees[nowtreeid-1].V.size()<<inf[nowtreeid].all.size()<<endl;
-				if(inf[loseid[nowtreeid]].stop || MTidForest.trees[loseid[nowtreeid]-1].V.size()==inf[loseid[nowtreeid]].all.size()) continue;
+				if(nowtree->stop || nowtree->V.size()==nowtree->all.size()) continue;
 
-				auto MTid=&MTidForest.trees[loseid[nowtreeid]-1];
+				bool change=false;
+
+				auto MTid=nowtree;
 				int s=MTid->s;
-				int t=inf[MTid->id].t;
-				auto dis=inf[MTid->id].all;
+				int t=MTid->t;
+				auto dis=MTid->all;
 				bool* arr=new bool[100001]();
 
 				priority_queue<graphEdge*, vector<graphEdge*>, cmp> pq;
@@ -193,6 +226,7 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 								//cout<<pq.top()->ce<<endl;
 								now=gE->vertex[1];
 								MTid->V.push_back(now);
+								change=true;
 								pq.pop();
 								break;
 							}
@@ -207,6 +241,7 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 								//cout<<pq.top()->ce<<endl;
 								now=gE->vertex[0];
 								MTid->V.push_back(now);
+								change=true;
 								pq.pop();
 								break;
 							}
@@ -214,13 +249,21 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 						pq.pop();
 					}
 				}
+				MTid->ct*=t;
 				
-				if(MTid->V.size()<dis.size()){
-					loseid[newlose++]=MTid->id;
+				if(change){
+					Tree T;
+					T.V=MTid->V;
+					T.E=MTid->E;
+					T.s=s;
+					T.id=MTid->id;
+					T.ct=MTid->ct;	
+					MTidForest.size++;
+					MTidForest.trees.push_back(T);
+
+					delete [] arr;
 				}
-				delete [] arr;
 			}
-			losesize=newlose;
 			break;
 		}
 	}
@@ -231,29 +274,33 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 void Problem1::rearrange(Graph &G, Forest &MTidForest) {
 	/* Store your output graph and multicast tree forest into G and MTidForest
 	   Note: Please include "all" active mutlicast trees in MTidForest. */
+	MTidForest.size=0;
+	MTidForest.trees.clear();
+	sort(F.trees.begin(), F.trees.end(), cmp1);
 
 	/* Write your code here. */
-	int numtree=MTidForest.trees.size();
-	losesize=0;
-	for(auto it:G.E){
-		for(auto &gE:G.E){
-			gE.b=gE.be;
-		}
+	
+
+	int numtree=F.trees.size();
+
+	for(auto &gE:G.E){
+		gE.b=gE.be;
 	}
-	for(auto nowtree=MTidForest.trees.begin();nowtree!=MTidForest.trees.cend();nowtree++){
+
+	for(auto nowtree=F.trees.begin();nowtree!=F.trees.cend();nowtree++){
 		nowtree->V.clear();
 		nowtree->E.clear();
 		nowtree->ct=0;
 	}
 
 
-	for(auto nowtree=MTidForest.trees.begin();nowtree!=MTidForest.trees.cend();nowtree++){
+	for(auto nowtree=F.trees.begin();nowtree!=F.trees.cend();nowtree++){
 		//cout<<inf[nowtree->id].stop<<nowtree->V.size()<<inf[nowtree->id].all.size()<<endl;
-		if(inf[nowtree->id].stop) continue;
+		if(nowtree->stop) continue;
 		auto MTid=nowtree;
 		int s=MTid->s;
-		int t=inf[MTid->id].t;
-		auto dis=inf[MTid->id].all;
+		int t=MTid->t;
+		auto dis=MTid->all;
 		bool* arr=new bool[100001]();
 
 		priority_queue<graphEdge*, vector<graphEdge*>, cmp> pq;
@@ -307,9 +354,16 @@ void Problem1::rearrange(Graph &G, Forest &MTidForest) {
 				pq.pop();
 			}
 		}
-		if(MTid->V.size()<dis.size()){
-			loseid[losesize++]=MTid->id;
-		}
+		MTid->ct*=t;
+		Tree T;
+		T.V=MTid->V;
+		T.E=MTid->E;
+		T.s=s;
+		T.id=MTid->id;
+		T.ct=MTid->ct;	
+		MTidForest.size++;
+		MTidForest.trees.push_back(T);
+
 		delete [] arr;
 	}
 	

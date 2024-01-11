@@ -21,7 +21,7 @@ class Information{
 		vector<int> all;
 };
 
-Information inf[100005];
+Information inf[100001];
 
 class Problem1 {
 public:
@@ -110,7 +110,7 @@ void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 			pq.pop();
 		}
 	}
-
+	
 	delete [] arr;
 
 	return;
@@ -124,8 +124,14 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 	for(auto it=MTidForest.trees.begin();it!=MTidForest.trees.cend();it++){
 		if(it->id==id){
 			inf[id].stop=true;
-			auto nowtree=MTidForest.trees[id-1];
-			for(auto ittre=nowtree.E.begin();ittre!=nowtree.E.cend();ittre++){
+			Tree* nowtree;
+			for(auto &ittre:MTidForest.trees){
+				if(ittre.id==id){
+					nowtree=&ittre;
+					break;
+				}
+			}
+			for(auto ittre=nowtree->E.begin();ittre!=nowtree->E.cend();ittre++){
 				for(auto itgre=G.E.begin();itgre!=G.E.cend();itgre++){
 					if(ittre->vertex[0]==itgre->vertex[0]&&ittre->vertex[1]==itgre->vertex[1]){
 						itgre->b+=inf[id].t;
@@ -135,6 +141,9 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 				}
 				//cout<<endl;
 			}
+			nowtree->V.clear();
+			nowtree->E.clear();
+			nowtree->ct=0;
 			
 			for(auto nowtree=MTidForest.trees.begin();nowtree!=MTidForest.trees.cend();nowtree++){
 				//cout<<inf[nowtree->id].stop<<nowtree->V.size()<<inf[nowtree->id].all.size()<<endl;
