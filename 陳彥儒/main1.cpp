@@ -4,11 +4,13 @@
 #include <iostream>
 #include "basicDS.h"
 #include "Problem1.cpp"
+#include <chrono>
 #include <fstream>
 #include <string>
 #include <queue>
 
 using namespace std;
+using namespace std::chrono;
 
 void graph_input(Graph& G) {
 	int vertex_num, edge_num;
@@ -70,12 +72,13 @@ int stop_input(string input_string) {
 	return stoi(tmp_s);
 }
 
-bool isdebug = false;
+bool isdebug = true;
 bool needToOutput = false;
 
 int main(void) {
-
-	freopen("Problem1_test_case.txt", "r", stdin);
+	auto start = high_resolution_clock::now();
+	freopen("sample_input.txt", "r", stdin);
+	freopen("sample_output.txt", "w", stdout);
 
 	Graph G;
 	Tree T;
@@ -122,5 +125,9 @@ int main(void) {
 			needToOutput = false;
 		}
 	}
+	auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+
+    cout << "Time taken by function: " << duration.count() << " microseconds" << std::endl;
 	return 0;
 }
