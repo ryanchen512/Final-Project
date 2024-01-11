@@ -73,10 +73,10 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 	for(auto t_edge: requests[id].MT.E)
 		edgesMap[t_edge.vertex[0]][t_edge.vertex[1]]->b += requests[id].t;
 	requests.erase(id);
-	// connect other partial tree
 	for(auto it = requests.begin(); it != requests.end(); ++it)
 	{
 		auto request = it->second;
+		cout << request.id;
 		// init
 		VertexDisjointSet vertex_dset(numOfV, request.MT.V);
 		vector<graphEdge*> new_MTEdges_G;

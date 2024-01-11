@@ -102,11 +102,18 @@ int main(void) {
 				command++;
 				cout << "\033[1;33mCommand " << command << "  insert" << "\033[0m" << endl;
 				cout << "request id: " << T.id << endl;
-				for(auto edge: T.E)
+				if(take)
 				{
-					cout << "{" << edge.vertex[0] << ", " << edge.vertex[1] << "}, ";
+					for(auto edge: T.E)
+					{
+						cout << "{" << edge.vertex[0] << ", " << edge.vertex[1] << "}, ";
+					}
+					cout << "total cost is " << T.ct << endl;
 				}
-				cout << "total cost is " << T.ct << endl;
+				else
+				{
+					cout << "reject" << endl;
+				}
 			}
 		}
 		else if (input_string[0] == 's') {

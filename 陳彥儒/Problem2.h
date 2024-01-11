@@ -43,7 +43,6 @@ class CompareTree
 {
 public:
     bool operator()(const Tree* lhs, const Tree* rhs) const { return lhs->id < rhs->id; }
-    //bool operator()(Tree *lhs, Tree *rhs) { return (lhs->id < rhs->id); }
 };
 
 struct request
@@ -51,6 +50,7 @@ struct request
     int id, s, t;
     bool isFull;
     Tree MT;
+    vector<int> D;
 };
 
 class VertexDisjointSet {
