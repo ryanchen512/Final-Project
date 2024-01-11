@@ -77,7 +77,7 @@ int command = 0;
 
 int main(void) {
 	auto start = high_resolution_clock::now();
-	freopen("Problem1_test_case.txt", "r", stdin);
+	freopen("sample_input.txt", "r", stdin);
 	freopen("sample_output.txt", "w", stdout);
 
 	Graph G;
@@ -142,6 +142,7 @@ int main(void) {
 				}
 			}
 		}
+		if(command>=200) break;
 	}
 	auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
