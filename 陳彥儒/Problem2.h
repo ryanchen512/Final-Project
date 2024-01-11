@@ -5,6 +5,7 @@
 #include <map>
 #include <queue>
 #include <algorithm>
+#include <set>
 
 using namespace std;
 
@@ -20,6 +21,7 @@ public:
     static map<int, int> vertexDegreeMap;
 private:
     void updateVertiexDegreeMap();
+    bool findUsefulEdge(int s, set<int> &D, map<int, vector<int>> &MTEdgeMap, vector<graphEdge*> &usefulMTEdge, set<int>* checkedVertice = nullptr);
     Graph graph;
     int numOfV;
     map<int, map<int, graphEdge*>> edgesMap;

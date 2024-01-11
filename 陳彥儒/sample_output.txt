@@ -1,41 +1,22 @@
-[1;33mCommand 1[0m
+[1;33mCommand 1  insert[0m
 request id: 1
 {1, 2}, {2, 3}, {3, 5}, {4, 5}, total cost is 250
-[1;33mCommand 2[0m
-request id: 1
-{1, 2}, {2, 3}, {3, 5}, {4, 5}, total cost is 250
+[1;33mCommand 2  insert[0m
 request id: 2
 {2, 3}, {3, 5}, {1, 3}, {4, 5}, total cost is 140
-[1;33mCommand 3[0m
-request id: 1
-{1, 2}, {2, 3}, {3, 5}, {4, 5}, total cost is 250
-request id: 2
-{2, 3}, {3, 5}, {1, 3}, {4, 5}, total cost is 140
+[1;33mCommand 3  insert[0m
 request id: 3
 {1, 3}, {2, 4}, {3, 4}, total cost is 450
-[1;33mCommand 4[0m
-request id: 1
-{1, 2}, {2, 3}, {8, 5}, {4, 5}, total cost is 250
-request id: 2
-total cost is 0
-request id: 3
-{1, 3}, {2, 9}, {3, 4}, total cost is 450
-[1;33mCommand 5[0m
-request id: 1
-{1, 2}, {2, 3}, {8, 5}, {4, 5}, total cost is 250
-request id: 2
-total cost is 0
-request id: 3
-{1, 3}, {2, 9}, {3, 4}, total cost is 450
+[1;33mCommand 4  stop[0m
+No tree be modified
+[1;33mCommand 5  insert[0m
 request id: 4
-total cost is 0
-[1;33mCommand 6[0m
+{2, 3}, {3, 5}, {1, 3}, {4, 5}, total cost is 140
+[1;33mCommand 6  rearrange[0m
 request id: 1
 {1, 2}, {2, 3}, {3, 5}, {4, 5}, total cost is 250
-request id: 2
-total cost is 0
 request id: 3
 {1, 3}, {2, 4}, {3, 4}, total cost is 450
 request id: 4
 {2, 3}, {3, 5}, {1, 3}, {4, 5}, total cost is 140
-Time taken by function: 1078 microseconds
+Time taken by function: 1218 microseconds
