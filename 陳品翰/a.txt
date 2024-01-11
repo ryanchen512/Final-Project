@@ -1,0 +1,24 @@
+#include "basicDS.h"
+
+class Problem1 {
+public:
+	Problem1(Graph G):currentGraph(G){/* Write your code here. */}  //constructor
+	~Problem1(){/* Write your code here. */}        //destructor
+	void insert(int id, int s, Set D, int t, Graph &G, Tree &MTid);
+	void stop(int id, Graph &G, Forest &MTidForest);
+	void rearrange(Graph &G, Forest &MTidForest);
+	Graph currentGraph;
+};
+
+void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid){
+    int ver[G.V.size()]={-1};
+	return;
+}
+
+void Problem1::stop(int id, Graph &G, Forest &MTidForest){
+	return;
+}
+
+void Problem1::rearrange(Graph &G, Forest &MTidForest){
+	return;
+}
