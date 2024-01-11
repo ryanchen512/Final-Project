@@ -7,7 +7,6 @@ using EdgePQ = priority_queue<graphEdge*, vector<graphEdge*>, CompareEdge>;
 /* You can add more functions or variables in each class. 
    But you "Shall Not" delete any functions or variables that TAs defined. */
 
-
 Problem2::Problem2(Graph G) {
 	/* Write your code here. */
 	graph = G;
@@ -32,16 +31,12 @@ bool Problem2::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	EdgePQ edge_pq;
 	for(int i=0; i<graph.E.size(); i++) 
 	{	
-		cout << graph.E[i].vertex[0] << " " << graph.E[i].vertex[1];
-		if(graph.E[i].b >= t) edge_pq.push(&graph.E[i]), cout << " success";
-		cout << endl;
+		if(graph.E[i].b >= t) edge_pq.push(&graph.E[i]);
 	}
 	// spanning tree
-	cout << id << endl;
 	while (!edge_pq.empty() && vertex_dset.numOfRoot() > 1)
 	{
 		graphEdge *newEdge = edge_pq.top();
-		cout << newEdge->vertex[0] << " " << newEdge->vertex[1] << endl;
 		edge_pq.pop();
 		if(vertex_dset.find(newEdge->vertex[0]) != vertex_dset.find(newEdge->vertex[1]))
 		{
@@ -52,17 +47,64 @@ bool Problem2::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	// check tree is full
 	for(auto vertex: D.destinationVertices) 
 		if(vertex_dset.find(vertex) != vertex_dset.find(s)) return false;
+	// RemoveUselessEdge
+	map<int, vector<int>> MTEdgeMap;
+	vector<graphEdge*> usefulMTEdge;
+	for(int i=0; i<MTEdges_G.size(); i++) 
+	{
+		MTEdgeMap[MTEdges_G[i]->vertex[0]].push_back(MTEdges_G[i]->vertex[1]);
+		MTEdgeMap[MTEdges_G[i]->vertex[1]].push_back(MTEdges_G[i]->vertex[0]);
+	}
+	set<int> Dset;
+	for(auto DEdge: D.destinationVertices) Dset.insert(DEdge);
+	findUsefulEdge(s, Dset, MTEdgeMap, usefulMTEdge);
 	// deal with effect of traffic
-	
+	set<int> usefulVertexSet;
+	int ct = 0;
+	for(int i=0; i<usefulMTEdge.size(); i++) 
+	{
+		usefulMTEdge[i]->be -= t;
+		usefulVertexSet.insert(usefulMTEdge[i]->vertex[0]);
+		usefulVertexSet.insert(usefulMTEdge[i]->vertex[1]);
+		ct += usefulMTEdge[i]->ce *= t;
+	}
 	// output tree
-
+	vector<int> usefulVertex;
+	for(int v: usefulVertexSet) usefulVertex.push_back(v);
+	// output tree
+	if(requests.find(id) == requests.end())
+	{
+		requests[id] = {id, s, t, true, {usefulVertex, usefulMTEdge, s, id, ct} };
+		MTid = requests[id].MT;
+	}
+	else
+		requests[id].MT = {usefulVertex, usefulMTEdge, s, id, ct};
+	G = graph;
 	return true;
+}
+
+bool Problem2::findUsefulEdge(int s, set<int> &D, map<int, vector<int>> &MTEdgeMap, vector<graphEdge*> &usefulMTEdge, set<int>* checkedVertice = nullptr)
+{
+	bool needToDeleteSet = false, isUseful = false;
+	if(checkedVertice = nullptr) checkedVertice  = new set<int>, needToDeleteSet = true;
+	for(auto v: MTEdgeMap[s])
+	{
+		if(checkedVertice->find(v) != checkedVertice->end())
+		if(findUsefulEdge(v, D, MTEdgeMap, usefulMTEdge, checkedVertice))
+		{
+			isUseful = true;
+			usefulMTEdge.push_back(edgesMap[s][v]);
+		}
+	}
+	if(D.find(s) != D.end()) return true;
+	if(MTEdgeMap[s].size() == 0) return false;
+	if(needToDeleteSet) delete checkedVertice;
+	return isUseful;
 }
 
 void Problem2::stop(int id, Graph &G, Forest &MTidForest) {
 	/* Store your output graph and multicast tree forest into G and MTidForest
 	   Note: Please "only" include mutlicast trees that you added nodes in MTidForest. */
-	
 	/* Write your code here. */
 	
 	return;
