@@ -2,6 +2,7 @@
 #include "basicDS.h"
 #include <queue>
 #include <algorithm>
+#include <map>
 using namespace std;
 
 /* You can add more functions or variables in each class. 
@@ -45,12 +46,18 @@ public:
 	void rearrange(Graph &G, Forest &MTidForest);
 
 private:
+	map<int, map<int, graphEdge*>> edgesMap;
 	FInformation F;
+	Graph graph;
 };
 
 Problem1::Problem1(Graph G) {
 	/* Write your code here. */
-
+	graph = G;
+	for(int i=0; i<G.E.size(); i++){
+		edgesMap[graph.E[i].vertex[0]][graph.E[i].vertex[1]] = &graph.E[i];
+		edgesMap[graph.E[i].vertex[1]][graph.E[i].vertex[0]] = &graph.E[i];
+	}
 }
 
 Problem1::~Problem1() {
@@ -75,49 +82,46 @@ void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	int now=s;
 	MTid.V.push_back(now);
 	arr[s]=true;
-	for(auto it:G.E){
-		for(auto &gE:G.E){
-			if(gE.vertex[0]==now&&!arr[gE.vertex[1]]){
-				pq.push(&gE);
-			}
-			if(gE.vertex[1]==now&&!arr[gE.vertex[0]]){
-				pq.push(&gE);
+	for(int i=1;i<G.V.size();i++){
+		for(auto &g:edgesMap[now]){
+			if(!arr[g.first] && g.second->b >= t){
+				pq.push(g.second);
 			}
 		}
 		while(!pq.empty()){
 			//cout<<"{ "<<pq.top()->vertex[0]<<" "<<pq.top()->vertex[1]<<" }";
 			auto gE=pq.top();
-			if(gE->b>=t){
-				if(!(arr[gE->vertex[1]])){
-					gE->b-=t;
-					treeEdge Te;
-					Te.vertex[0]=gE->vertex[0];
-					Te.vertex[1]=gE->vertex[1];
-					arr[gE->vertex[1]]=true;
-					MTid.E.push_back(Te);
-					MTid.ct+=(gE->ce);
-					//cout<<pq.top()->ce<<endl;
-					now=gE->vertex[1];
-					MTid.V.push_back(now);
-					pq.pop();
-					break;
-				}
-				else if(!(arr[gE->vertex[0]])){
-					gE->b-=t;
-					treeEdge Te;
-					Te.vertex[0]=gE->vertex[0];
-					Te.vertex[1]=gE->vertex[1];
-					arr[gE->vertex[0]]=true;
-					MTid.E.push_back(Te);
-					MTid.ct+=(gE->ce);
-					//cout<<pq.top()->ce<<endl;
-					now=gE->vertex[0];
-					MTid.V.push_back(now);
-					pq.pop();
-					break;
-				}
+			//cout<<gE->be<<" ";
+			if(!(arr[gE->vertex[1]])){
+				gE->b-=t;
+				treeEdge Te;
+				Te.vertex[0]=gE->vertex[0];
+				Te.vertex[1]=gE->vertex[1];
+				arr[gE->vertex[1]]=true;
+				MTid.E.push_back(Te);
+				MTid.ct+=(gE->ce);
+				//cout<<pq.top()->ce<<endl;
+				now=gE->vertex[1];
+				MTid.V.push_back(now);
+				pq.pop();
+				break;
+			}
+			else if(!(arr[gE->vertex[0]])){
+				gE->b-=t;
+				treeEdge Te;
+				Te.vertex[0]=gE->vertex[0];
+				Te.vertex[1]=gE->vertex[1];
+				arr[gE->vertex[0]]=true;
+				MTid.E.push_back(Te);
+				MTid.ct+=(gE->ce);
+				//cout<<pq.top()->ce<<endl;
+				now=gE->vertex[0];
+				MTid.V.push_back(now);
+				pq.pop();
+				break;
 			}
 			pq.pop();
+			break;
 		}
 	}
 	
@@ -134,7 +138,7 @@ void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	F.size++;
 
 	delete [] arr;
-
+	G = graph;
 	return;
 }
 
@@ -150,23 +154,13 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 	for(auto it=F.trees.begin();it!=F.trees.cend();it++){
 		if(it->id==id){
 			it->stop=true;
-			Information* nowtree;
-			for(auto &ittre:F.trees){
-				if(ittre.id==id){
-					nowtree=&ittre;
-					break;
-				}
-			}
+			Information* nowtree=&(*it);
+
 			for(auto ittre=nowtree->E.begin();ittre!=nowtree->E.cend();ittre++){
-				for(auto itgre=G.E.begin();itgre!=G.E.cend();itgre++){
-					if(ittre->vertex[0]==itgre->vertex[0]&&ittre->vertex[1]==itgre->vertex[1]){
-						itgre->b+=(nowtree->t);
-						//cout<<ittre->vertex[0]<<" "<<ittre->vertex[1]<<" "<<itgre->b;
-						break;
-					}
-				}
-				//cout<<endl;
+				(edgesMap[ittre->vertex[0]][ittre->vertex[1]])->b+=(nowtree->t);
+				//cout<<ittre->vertex[0]<<" "<<ittre->vertex[1]<<" "<<itgre->b;
 			}
+				//cout<<endl;
 			nowtree->V.clear();
 			nowtree->E.clear();
 			nowtree->ct=0;
@@ -176,7 +170,6 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 				if(nowtree->stop || nowtree->V.size()==nowtree->all.size()) continue;
 
 				bool change=false;
-
 				auto MTid=nowtree;
 				int s=MTid->s;
 				int t=MTid->t;
@@ -190,24 +183,18 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 					arr[iter]=true;
 				}
 
-				for(auto iter:MTid->V){
-					for(auto &gE:G.E){
-						if(gE.vertex[0]==iter&&!arr[gE.vertex[1]]){
-							pq.push(&gE);
-						}
-						if(gE.vertex[1]==iter&&!arr[gE.vertex[0]]){
-							pq.push(&gE);
+				for(auto now:MTid->V){
+					for(auto &g:edgesMap[now]){
+						if(!arr[g.first] && g.second->b >= t){
+							pq.push(g.second);
 						}
 					}
 				}
 				
-				for(auto iter:G.E){
-					for(auto &gE:G.E){
-						if(gE.vertex[0]==now&&!arr[gE.vertex[1]]){
-							pq.push(&gE);
-						}
-						if(gE.vertex[1]==now&&!arr[gE.vertex[0]]){
-							pq.push(&gE);
+				for(int i=MTid->V.size()-1;i<G.V.size();i++){
+					for(auto &g:edgesMap[now]){
+						if(!arr[g.first] && g.second->b >= t){
+							pq.push(g.second);
 						}
 					}
 					while(!pq.empty()){
@@ -308,13 +295,10 @@ void Problem1::rearrange(Graph &G, Forest &MTidForest) {
 		MTid->V.push_back(now);
 		arr[s]=true;
 
-		for(auto iter:G.E){
-			for(auto &gE:G.E){
-				if(gE.vertex[0]==now&&!arr[gE.vertex[1]]){
-					pq.push(&gE);
-				}
-				if(gE.vertex[1]==now&&!arr[gE.vertex[0]]){
-					pq.push(&gE);
+		for(int i=1;i<G.V.size();i++){
+			for(auto &g:edgesMap[now]){
+				if(!arr[g.first] && g.second->b >= t){
+					pq.push(g.second);
 				}
 			}
 			while(!pq.empty()){
