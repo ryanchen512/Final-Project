@@ -73,12 +73,11 @@ int stop_input(string input_string) {
 }
 
 bool isdebug = true;
-bool needToOutput = false;
 
 int main(void) {
 	auto start = high_resolution_clock::now();
 	freopen("sample_input.txt", "r", stdin);
-	freopen("sample_output.txt", "w", stdout);
+	//freopen("sample_output.txt", "w", stdout);
 
 	Graph G;
 	Tree T;
@@ -88,41 +87,31 @@ int main(void) {
 	Problem1 P1(G);
 
 	string input_string;
-	int line = 0;
+	int command = 0;
 	while (getline(cin, input_string)) {
 		if (input_string[0] == 'i') {
 			int id, s, t;
 			Set D;
 			insert_input(id, s, t, D, input_string);
 			P1.insert(id, s, D, t, G, T);
-			F.trees.push_back(T);
-			F.size ++;
-			needToOutput = true;
+			if(isdebug)
+			{
+				command++;
+				cout << "\033[1;33mCommand " << command << "  insert" << "\033[0m" << endl;
+				cout << "request id: " << T.id << endl;
+				for(auto edge: T.E)
+				{
+					cout << "{" << edge.vertex[0] << ", " << edge.vertex[1] << "}, ";
+				}
+				cout << "total cost is " << T.ct << endl;
+			}
 		}
 		else if (input_string[0] == 's') {
 			int id = stop_input(input_string);
 			P1.stop(id, G, F);
-			needToOutput = true;
 		}
 		else if (input_string[0] == 'r') {
 			P1.rearrange(G, F);
-			needToOutput = true;
-		}
-		if(isdebug && needToOutput)
-		{
-			static int command = 0;
-			command++;
-			cout << "\033[1;33mCommand " << command << "\033[0m" << endl;
-			for(auto tree: F.trees)
-			{
-				cout << "request id: " << tree.id << endl;
-				for(auto edge: tree.E)
-				{
-					cout << "{" << edge.vertex[0] << ", " << edge.vertex[1] << "}, ";
-				}
-				cout << "total cost is " << tree.ct << endl;
-			}
-			needToOutput = false;
 		}
 	}
 	auto stop = high_resolution_clock::now();

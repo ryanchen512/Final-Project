@@ -18,9 +18,11 @@ public:
 	void stop(int id, Graph &G, Forest &MTidForest);
 	void rearrange(Graph &G, Forest &MTidForest);
 private:
+    Graph graph;
     int numOfV;
-    vector<request> requests;
     map<int, map<int, graphEdge*>> edgesMap;
+    map<int, request> requests;
+    Forest forest;
 };
 
 class CompareEdge
@@ -33,6 +35,7 @@ struct request
 {
     int id, s, t;
     bool isFull, isstoped;
+    Tree* MT;
 };
 
 class VertexDisjointSet {
