@@ -121,7 +121,6 @@ void Problem1::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 				break;
 			}
 			pq.pop();
-			break;
 		}
 	}
 	
@@ -209,7 +208,7 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 								Te.vertex[1]=gE->vertex[1];
 								arr[gE->vertex[1]]=true;
 								MTid->E.push_back(Te);
-								MTid->ct+=(gE->ce);
+								MTid->ct+=(gE->ce*t);
 								//cout<<pq.top()->ce<<endl;
 								now=gE->vertex[1];
 								MTid->V.push_back(now);
@@ -224,7 +223,7 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 								Te.vertex[1]=gE->vertex[1];
 								arr[gE->vertex[0]]=true;
 								MTid->E.push_back(Te);
-								MTid->ct+=(gE->ce);
+								MTid->ct+=(gE->ce*t);
 								//cout<<pq.top()->ce<<endl;
 								now=gE->vertex[0];
 								MTid->V.push_back(now);
@@ -236,7 +235,6 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 						pq.pop();
 					}
 				}
-				MTid->ct*=t;
 				
 				if(change){
 					Tree T;
@@ -246,10 +244,9 @@ void Problem1::stop(int id, Graph &G, Forest &MTidForest) {
 					T.id=MTid->id;
 					T.ct=MTid->ct;	
 					MTidForest.size++;
-					MTidForest.trees.push_back(T);
-
-					delete [] arr;
+					MTidForest.trees.push_back(T);	
 				}
+				delete [] arr;
 			}
 			break;
 		}
@@ -289,7 +286,6 @@ void Problem1::rearrange(Graph &G, Forest &MTidForest) {
 		int s=MTid->s;
 		int t=MTid->t;
 		auto dis=MTid->all;
-		MTid->ct=0;
 		bool* arr=new bool[100001]();
 
 		priority_queue<graphEdge*, vector<graphEdge*>, cmp> pq;

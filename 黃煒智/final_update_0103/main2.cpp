@@ -85,9 +85,12 @@ int main(void) {
             bool take;
 			insert_input(id, s, t, D, input_string);
 			take = P2.insert(id, s, D, t, G, T);
+			cout<<take;
 			cout<<"tree id = " << T.id<<" root = " << T.s << " bandwidth cost = " << T.ct<<endl;
-			for(auto it=T.E.begin(); it!=T.E.cend();it++){
-				cout<<"{ "<<it->vertex[0]<<" "<<it->vertex[1]<<" }";
+			if(!T.E.empty()){
+				for(auto it=T.E.begin(); it!=T.E.cend();it++){
+					cout<<"{ "<<it->vertex[0]<<" "<<it->vertex[1]<<" }";
+				}
 			}
 			cout<<endl;
 		}
