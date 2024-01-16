@@ -19,4 +19,4 @@ request id: 3
 {1, 3}, {2, 4}, {3, 4}, total cost is 450
 request id: 4
 {2, 3}, {3, 5}, {1, 3}, {4, 5}, total cost is 140
-Time taken by function: 1218 microseconds
+Time taken by function: 964 microseconds

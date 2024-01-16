@@ -78,7 +78,7 @@ int command = 0;
 int main(void) {
 	auto start = high_resolution_clock::now();
 	freopen("sample_input.txt", "r", stdin);
-	freopen("sample_output.txt", "w", stdout);
+	//freopen("sample_output.txt", "w", stdout);
 
 	Graph G;
 	Tree T;

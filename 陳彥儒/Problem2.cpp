@@ -12,7 +12,10 @@ Problem2::Problem2(Graph G) {
 	graph = G;
 	numOfV = graph.V.size(); 
 	for(int i=0; i<G.E.size(); i++) 
+	{
 		edgesMap[graph.E[i].vertex[0]][graph.E[i].vertex[1]] = &graph.E[i];
+		edgesMap[graph.E[i].vertex[1]][graph.E[i].vertex[0]] = &graph.E[i];
+	}
 }
 
 Problem2::~Problem2() {
@@ -26,7 +29,7 @@ bool Problem2::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	/* You should return true or false according the insertion result */
 	// init
 	updateVertiexDegreeMap();
-		VertexDisjointSet vertex_dset(numOfV);
+	VertexDisjointSet vertex_dset(numOfV);
 	vector<graphEdge*> MTEdges_G;
 	EdgePQ edge_pq;
 	for(int i=0; i<graph.E.size(); i++) 
@@ -45,8 +48,12 @@ bool Problem2::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 		}
 	}
 	// check tree is full
-	for(auto vertex: D.destinationVertices) 
-		if(vertex_dset.find(vertex) != vertex_dset.find(s)) return false;
+	for(auto vertex: D.destinationVertices)
+		if(vertex_dset.find(vertex) != vertex_dset.find(s)) 
+		{
+			requests[id] = {id, s, t, false, { { }, { }, s, id, 0}, D.destinationVertices };
+			return false;
+		}
 	// RemoveUselessEdge
 	map<int, vector<int>> MTEdgeMap;
 	vector<graphEdge*> usefulMTEdge;
@@ -59,39 +66,32 @@ bool Problem2::insert(int id, int s, Set D, int t, Graph &G, Tree &MTid) {
 	for(auto DEdge: D.destinationVertices) Dset.insert(DEdge);
 	findUsefulEdge(s, Dset, MTEdgeMap, usefulMTEdge);
 	// deal with effect of traffic
-	set<int> usefulVertexSet;
 	int ct = 0;
 	for(int i=0; i<usefulMTEdge.size(); i++) 
 	{
-		usefulMTEdge[i]->be -= t;
-		usefulVertexSet.insert(usefulMTEdge[i]->vertex[0]);
-		usefulVertexSet.insert(usefulMTEdge[i]->vertex[1]);
-		ct += usefulMTEdge[i]->ce *= t;
+		usefulMTEdge[i]->b -= t;
+		ct += usefulMTEdge[i]->ce * t;
 	}
-	// output tree
-	vector<int> usefulVertex;
-	for(int v: usefulVertexSet) usefulVertex.push_back(v);
 	// output tree
 	vector<treeEdge> usefulMTEdge_T;
 	for(auto edge: usefulMTEdge) usefulMTEdge_T.push_back({edge->vertex[0], edge->vertex[1]});
 	if(requests.find(id) == requests.end())
-	{
-		requests[id] = {id, s, t, true, {usefulVertex, usefulMTEdge_T, s, id, ct} };
-		MTid = requests[id].MT;
-	}
+		requests[id] = {id, s, t, true, {D.destinationVertices , usefulMTEdge_T, s, id, ct}, D.destinationVertices};
 	else
-		requests[id].MT = {usefulVertex, usefulMTEdge_T, s, id, ct};
+		requests[id].MT = {D.destinationVertices, usefulMTEdge_T, s, id, ct};
+	MTid = requests[id].MT;
 	G = graph;
 	return true;
 }
 
-bool Problem2::findUsefulEdge(int s, set<int> &D, map<int, vector<int>> &MTEdgeMap, vector<graphEdge*> &usefulMTEdge, set<int>* checkedVertice = nullptr)
+bool Problem2::findUsefulEdge(int s, set<int> &D, map<int, vector<int>> &MTEdgeMap, vector<graphEdge*> &usefulMTEdge, set<int>* checkedVertice)
 {
 	bool needToDeleteSet = false, isUseful = false;
-	if(checkedVertice = nullptr) checkedVertice  = new set<int>, needToDeleteSet = true;
+	if(checkedVertice == nullptr) checkedVertice  = new set<int>, needToDeleteSet = true;
+	checkedVertice->insert(s);
 	for(auto v: MTEdgeMap[s])
 	{
-		if(checkedVertice->find(v) != checkedVertice->end())
+		if(checkedVertice->find(v) == checkedVertice->end())
 		if(findUsefulEdge(v, D, MTEdgeMap, usefulMTEdge, checkedVertice))
 		{
 			isUseful = true;
@@ -108,7 +108,66 @@ void Problem2::stop(int id, Graph &G, Forest &MTidForest) {
 	/* Store your output graph and multicast tree forest into G and MTidForest
 	   Note: Please "only" include mutlicast trees that you added nodes in MTidForest. */
 	/* Write your code here. */
-	
+	// stop tree
+	for(auto t_edge: requests[id].MT.E)
+		edgesMap[t_edge.vertex[0]][t_edge.vertex[1]]->b += requests[id].t;
+	requests.erase(id);
+	// connect other partial tree
+	for(auto it = requests.begin(); it != requests.end(); ++it)
+	{
+		auto request = it->second;
+		if(request.isFull) continue;
+		// init
+		updateVertiexDegreeMap();
+		VertexDisjointSet vertex_dset(numOfV);
+		vector<graphEdge*> MTEdges_G;
+		EdgePQ edge_pq;
+		for(int i=0; i<graph.E.size(); i++) 
+		{	
+			if(graph.E[i].b >= request.t) edge_pq.push(&graph.E[i]);
+		}
+		// spanning tree
+		while (!edge_pq.empty() && vertex_dset.numOfRoot() > 1)
+		{
+			graphEdge *newEdge = edge_pq.top();
+			edge_pq.pop();
+			if(vertex_dset.find(newEdge->vertex[0]) != vertex_dset.find(newEdge->vertex[1]))
+			{
+				MTEdges_G.push_back(newEdge);
+				vertex_dset.unionSets(newEdge->vertex[0], newEdge->vertex[1]);
+			}
+		}
+		// check tree is full
+		bool isC = false;
+		for(auto vertex: request.D)
+			if(vertex_dset.find(vertex) != vertex_dset.find(request.s)) 
+				isC = true;
+		if(isC) continue;
+		// RemoveUselessEdge
+		map<int, vector<int>> MTEdgeMap;
+		vector<graphEdge*> usefulMTEdge;
+		for(int i=0; i<MTEdges_G.size(); i++) 
+		{
+			MTEdgeMap[MTEdges_G[i]->vertex[0]].push_back(MTEdges_G[i]->vertex[1]);
+			MTEdgeMap[MTEdges_G[i]->vertex[1]].push_back(MTEdges_G[i]->vertex[0]);
+		}
+		set<int> Dset;
+		for(auto DEdge:  request.D) Dset.insert(DEdge);
+		findUsefulEdge(request.s, Dset, MTEdgeMap, usefulMTEdge);
+		// deal with effect of traffic
+		int ct = 0;
+		for(int i=0; i<usefulMTEdge.size(); i++) 
+		{
+			usefulMTEdge[i]->b -= request.t;
+			ct += usefulMTEdge[i]->ce * request.t;
+		}
+		// output tree
+		vector<treeEdge> usefulMTEdge_T;
+		for(auto edge: usefulMTEdge) usefulMTEdge_T.push_back({edge->vertex[0], edge->vertex[1]});
+			request.MT = {request.D, usefulMTEdge_T, request.s, request.id, ct};
+		MTidForest.trees.push_back(request.MT);
+	}
+	G = graph;
 	return;
 }
 
@@ -117,7 +176,25 @@ void Problem2::rearrange(Graph &G, Forest &MTidForest) {
 	   Note: Please include "all" active mutlicast trees in MTidForest. */
 
 	/* Write your code here. */
-	
+	for(int i=0; i<graph.E.size(); i++) graph.E[i].b = graph.E[i].be;
+	set<int> priorRequestId;
+	for(auto it = requests.begin(); it != requests.end(); ++it)
+	{
+		auto request = it->second;
+		if(request.isFull) continue;
+		else priorRequestId.insert(request.id);
+		it->second.MT = {{}, {}, it->second.s, it->second.id, 0};
+		if(insert(request.id, request.s, {0, request.D}, request.t, graph, request.MT))
+			MTidForest.trees.push_back(request.MT);
+	}
+	for(auto it = requests.begin(); it != requests.end(); ++it)
+	{
+		auto request = it->second;
+		if(priorRequestId.find(request.id) != priorRequestId.end()) continue;
+		it->second.MT = {{}, {}, it->second.s, it->second.id, 0};
+		if(insert(request.id, request.s, {0, request.D}, request.t, graph, request.MT))
+			MTidForest.trees.push_back(request.MT);
+	}
 	return;
 }
 
@@ -136,7 +213,7 @@ void Problem2::updateVertiexDegreeMap()
 int CompareEdge::computePoint(graphEdge *edge)
 { 
 	auto degreeMap = Problem2::vertexDegreeMap;
-	return degreeMap[edge->vertex[0]] + degreeMap[edge->vertex[0]] - square(edge->ce);
+	return degreeMap[edge->vertex[0]] + degreeMap[edge->vertex[0]] - square(edge->ce) * 10;
 }
 
 
